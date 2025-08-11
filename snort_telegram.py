@@ -3,7 +3,7 @@ import requests
 import sys
 
 # Ganti dengan token dan chat_id milik Anda
-TOKEN = "8427189453:AAFTTtDI3EZqO8m9FjI19mGYqUz5NTRS2CM"
+TOKEN = "7275669644:AAFGSzm0LN3hn9blLrHps91Ltap-Qckpxrg"
 CHAT_ID = "1277871346"
 
 def send_telegram(message):
@@ -17,4 +17,5 @@ def send_telegram(message):
 if __name__ == "__main__":
     # Pesan diambil dari argumen command line
     message = " ".join(sys.argv[1:])
+
     send_telegram(message)
