@@ -31,14 +31,14 @@ try:
             if line:
                 buffer.append(line)
 
-                # Minimal 3 baris untuk 1 alert
+                # Tunggu sampai minimal 3 baris terkumpul
                 if len(buffer) >= 3 and "->" in buffer[2]:
-                    # Jenis serangan (baris 1)
-                    jenis = re.sub(r"\[.*?\]", "", buffer[0]).strip()
+                    # --- Baris 1: Jenis Serangan ---
+                    jenis_match = re.search(r"\]\s*(.*?)\s*\[\*\*", buffer[0])
+                    jenis = jenis_match.group(1) if jenis_match else buffer[0]
 
-                    # Waktu + IP (baris 3)
+                    # --- Baris 3: Waktu + IP ---
                     waktu_ip = buffer[2]
-
                     waktu_match = re.match(r"^(\d+/\d+-\d+:\d+:\d+\.\d+)", waktu_ip)
                     ip_match = re.search(r"(\d+\.\d+\.\d+\.\d+)\s*->\s*(\d+\.\d+\.\d+\.\d+)", waktu_ip)
 
@@ -46,6 +46,7 @@ try:
                     ip_src = ip_match.group(1) if ip_match else "?"
                     ip_dst = ip_match.group(2) if ip_match else "?"
 
+                    # Format pesan rapih
                     pesan = (
                         "🚨 SNORT ALERT 🚨\n"
                         f"Jenis Serangan : {jenis}\n"
