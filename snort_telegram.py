@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import requests
 import time
+import re
 
 TOKEN = "8465459738:AAG7L5oMvT4-9MX_ZHo_LEKskNDUKML_k6o"  # ganti
 CHAT_ID = "1277871346"  # ganti
@@ -28,3 +29,4 @@ try:
                 send_telegram(f"🚨 SNORT ALERT 🚨\n{line}")
 except FileNotFoundError:
     print(f"File {ALERT_FILE} tidak ditemukan.")
+
