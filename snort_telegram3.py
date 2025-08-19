@@ -19,7 +19,8 @@ print("Monitoring Snort alert log...")
 try:
     with open(ALERT_FILE, "r") as f:
         f.seek(0, 2)  # skip log lama
-        buffer = []
+        buffer = []   # untuk menampung baris alert
+
         while True:
             line = f.readline()
             if not line:
@@ -30,24 +31,20 @@ try:
             if line:
                 buffer.append(line)
 
-                # Jika sudah cukup baris untuk 1 alert
-                if len(buffer) >= 3:
-                    jenis = ""
-                    waktu = ""
-                    ip_src = ""
-                    ip_dst = ""
+                # Jika sudah kumpul minimal 3 baris alert
+                if len(buffer) >= 3 and "->" in buffer[2]:
+                    # Ambil jenis serangan (baris pertama)
+                    jenis = re.sub(r"\[.*?\]", "", buffer[0]).strip()
 
-                    # Baris 1 = jenis serangan
-                    if "[**]" in buffer[0]:
-                        jenis = re.sub(r"\[.*?\]", "", buffer[0]).strip()
+                    # Ambil waktu & IP (baris ketiga)
+                    waktu_ip = buffer[2]
 
-                    # Baris 3 = waktu + IP
-                    if "->" in buffer[2]:
-                        parts = buffer[2].split()
-                        if len(parts) >= 3:
-                            waktu = parts[0]  # ambil timestamp
-                            ip_src = parts[1]
-                            ip_dst = parts[3]
+                    waktu_match = re.match(r"^(\d+/\d+-\d+:\d+:\d+\.\d+)", waktu_ip)
+                    ip_match = re.search(r"(\d+\.\d+\.\d+\.\d+)\s*->\s*(\d+\.\d+\.\d+\.\d+)", waktu_ip)
+
+                    waktu = waktu_match.group(1) if waktu_match else "Tidak diketahui"
+                    ip_src = ip_match.group(1) if ip_match else "?"
+                    ip_dst = ip_match.group(2) if ip_match else "?"
 
                     # Format pesan
                     pesan = (
