@@ -30,22 +30,26 @@ try:
             if line:
                 buffer.append(line)
 
-                # Jika sudah dapat minimal 3 baris (judul, priority, waktu+ip)
-                if len(buffer) >= 3 and "->" in buffer[2]:
-                    jenis_raw = buffer[0]
-                    waktu_ip = buffer[2]
+                # Jika sudah cukup baris untuk 1 alert
+                if len(buffer) >= 3:
+                    jenis = ""
+                    waktu = ""
+                    ip_src = ""
+                    ip_dst = ""
 
-                    # Jenis serangan (buang [**] [id] [**])
-                    jenis = re.sub(r"\[.*?\]", "", jenis_raw).strip()
+                    # Baris 1 = jenis serangan
+                    if "[**]" in buffer[0]:
+                        jenis = re.sub(r"\[.*?\]", "", buffer[0]).strip()
 
-                    # Ambil waktu dan IP
-                    waktu_match = re.match(r"^(\d+/\d+-\d+:\d+:\d+\.\d+)", waktu_ip)
-                    ip_match = re.search(r"(\d+\.\d+\.\d+\.\d+)\s*->\s*(\d+\.\d+\.\d+\.\d+)", waktu_ip)
+                    # Baris 3 = waktu + IP
+                    if "->" in buffer[2]:
+                        parts = buffer[2].split()
+                        if len(parts) >= 3:
+                            waktu = parts[0]  # ambil timestamp
+                            ip_src = parts[1]
+                            ip_dst = parts[3]
 
-                    waktu = waktu_match.group(1) if waktu_match else "Tidak diketahui"
-                    ip_src = ip_match.group(1) if ip_match else "?"
-                    ip_dst = ip_match.group(2) if ip_match else "?"
-
+                    # Format pesan
                     pesan = (
                         "🚨 SNORT ALERT 🚨\n"
                         f"Jenis Serangan : {jenis}\n"
