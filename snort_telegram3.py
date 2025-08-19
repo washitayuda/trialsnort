@@ -19,7 +19,7 @@ print("Monitoring Snort alert log...")
 try:
     with open(ALERT_FILE, "r") as f:
         f.seek(0, 2)  # skip log lama
-        buffer = []   # untuk menampung beberapa baris 1 alert
+        buffer = []
         while True:
             line = f.readline()
             if not line:
@@ -30,12 +30,15 @@ try:
             if line:
                 buffer.append(line)
 
-                # Jika sudah dapat 3 baris utama (msg, waktu+IP, protokol)
-                if len(buffer) >= 3:
-                    jenis = re.sub(r"\[.*?\]", "", buffer[0]).strip()  # ambil pesan serangan
-                    waktu_ip = buffer[2] if "->" in buffer[2] else buffer[1]
+                # Jika sudah dapat minimal 3 baris (judul, priority, waktu+ip)
+                if len(buffer) >= 3 and "->" in buffer[2]:
+                    jenis_raw = buffer[0]
+                    waktu_ip = buffer[2]
 
-                    # Extract waktu dan IP
+                    # Jenis serangan (buang [**] [id] [**])
+                    jenis = re.sub(r"\[.*?\]", "", jenis_raw).strip()
+
+                    # Ambil waktu dan IP
                     waktu_match = re.match(r"^(\d+/\d+-\d+:\d+:\d+\.\d+)", waktu_ip)
                     ip_match = re.search(r"(\d+\.\d+\.\d+\.\d+)\s*->\s*(\d+\.\d+\.\d+\.\d+)", waktu_ip)
 
